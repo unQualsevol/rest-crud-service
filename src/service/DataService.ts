@@ -1,4 +1,3 @@
-
 export default interface DataService<T, K> {
   create(data: T): K;
 
@@ -8,5 +7,5 @@ export default interface DataService<T, K> {
 
   update(key: K, Data: Partial<T>): boolean;
 
-  delete(key: K): void;
+  delete(key: K): boolean;
 }

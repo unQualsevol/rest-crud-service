@@ -1,56 +1,58 @@
 import DataService from "./DataService";
+import {readJsonFile, writeJsonFile} from "../utils/FileUtils";
 
 export interface Identifiable<K> {
   id: K;
 }
 
-const fs = require("fs");
-
 export class JsonDataService<T extends Identifiable<K>, K>
   implements DataService<T, K> {
-  private readonly path;
-
-  constructor(path: string) {
-    this.path = path;
-  }
+  constructor(private readonly path: string) {}
 
   create(data: T): K {
-    let datas = this.retrieveAll();
-    datas.push(data);
-    this.writeFile(datas);
+    this.validateData(data);
+    const dataArray = this.retrieveAll();
+    if(this.findById(data.id, dataArray)){
+      return undefined;
+    }
+    dataArray.push(data);
+    writeJsonFile(dataArray, this.path);
     return data.id;
   }
 
   retrieveAll(): T[] {
-    return this.readFile();
+    return readJsonFile(this.path);
   }
 
   retrieve(key: K): T {
-    return this.retrieveAll().find((d) => d.id === key);
+    return this.findById(key, this.retrieveAll());
   }
 
   update(key: K, data: Partial<T>): boolean {
-    let datas = this.retrieveAll();
-    let indexOf = datas.findIndex((d) => d.id === key);
+    let dataArray = this.retrieveAll();
+    let indexOf = dataArray.findIndex((d) => d.id === key);
     if (indexOf >= 0) {
-      datas[indexOf] = { ...datas[indexOf], ...data };
-      this.writeFile(datas);
+      dataArray[indexOf] = { ...dataArray[indexOf], ...data };
+      writeJsonFile(dataArray, this.path);
       return true;
     }
     return false;
   }
 
-  delete(key: K): void {
-    let datas = this.retrieveAll().filter((d) => d.id !== key);
-    this.writeFile(datas);
+  delete(key: K): boolean {
+    let dataArray = this.retrieveAll();
+    let filteredData = dataArray.filter((d) => d.id !== key);
+    writeJsonFile(filteredData, this.path)
+    return dataArray.length - filteredData.length > 0;
   }
 
-  private readFile(): T[] {
-    let rawdata = fs.readFileSync(this.path);
-    return JSON.parse(rawdata);
+  private findById(id: K, dataArray:T[]): T {
+    return dataArray.find((a) => a.id === id);
   }
 
-  private writeFile(data: T[]) {
-    fs.writeFileSync(this.path, JSON.stringify(data));
+  private validateData(data: T) {
+    if (!data.id) {
+      throw Error("Missing id.");
+    }
   }
 }

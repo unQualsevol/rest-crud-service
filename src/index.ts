@@ -1,11 +1,13 @@
 import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+
 import { JsonDataService } from "./service/JsonDataService";
 
 type Data = { id: string; active: boolean };
-
-const bodyParser = require("body-parser");
 const app = express();
 app.use(bodyParser.json());
+app.use(cors({origin: true}));
 const port = 8080 || process.env.PORT;
 const server = new JsonDataService<Data, string>("resources/db.json");
 

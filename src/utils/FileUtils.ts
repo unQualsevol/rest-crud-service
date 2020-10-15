@@ -1,11 +1,10 @@
-
-const fs = require("fs");
+import {readFileSync, writeFileSync} from "fs";
 
 export function readJsonFile<T>(filePath: string): T[] {
-    let rawdata = fs.readFileSync(filePath);
+    let rawdata = readFileSync(filePath, "utf8");
     return JSON.parse(rawdata);
 }
 
 export function writeJsonFile<T>(apps: T[], filePath: string) {
-    fs.writeFileSync(filePath, JSON.stringify(apps));
+    writeFileSync(filePath, JSON.stringify(apps), "utf8");
 }

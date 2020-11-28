@@ -1,10 +1,10 @@
-import {readFileSync, writeFileSync} from "fs";
+import { readFileSync, writeFileSync } from 'fs';
 
 export function readJsonFile<T>(filePath: string): T[] {
-    let rawdata = readFileSync(filePath, "utf8");
-    return JSON.parse(rawdata);
+	const rawdata = readFileSync(filePath, 'utf8');
+	return JSON.parse(rawdata);
 }
 
-export function writeJsonFile<T>(apps: T[], filePath: string) {
-    writeFileSync(filePath, JSON.stringify(apps), "utf8");
+export function writeJsonFile<T>(apps: T[], filePath: string): void {
+	writeFileSync(filePath, JSON.stringify(apps), 'utf8');
 }
